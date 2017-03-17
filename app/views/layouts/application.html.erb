@@ -9,9 +9,17 @@
   </head>
 
   <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+    <div class="container text-center">
+      <% unless notice==nil %>
+        <p class="alert alert-success"><%= notice %></p>
+      <% end %>
+      <% unless alert==nil %>
+        <p class="alert alert-danger"><%= alert %></p>
+      <% end %>
+      <% if user_signed_in? %>
+        <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+      <% end %>
+    </div>
     <%= yield %>
   </body>
 </html>

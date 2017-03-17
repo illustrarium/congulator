@@ -1,4 +1,6 @@
 class SmssController < ApplicationController
+  before_action :authenticate_user!
+
   @@data = {
       :username => "391504128",
       :password => "dCwy84Cn",
@@ -8,34 +10,34 @@ class SmssController < ApplicationController
   }
   
   def index
-    @today = current_day
-    @tomorrow = next_day
-    @users = get_users_by_query(@today) #[#<Amorail::Contact:0x007f06300daa60 @last_modified=1489640612, @linked_leads_id=["13219534"], @id=27737398, @name="", @date_create=1475581903, @responsible_user_id=475077, @linked_company_id="0", @company_name="", @phone="375292449550">]
-    # @users = get_users_by_query("Пащенко") #[#<Amorail::Contact:0x007f06300daa60 @last_modified=1489640612, @linked_leads_id=["13219534"], @id=27737398, @name="", @date_create=1475581903, @responsible_user_id=475077, @linked_company_id="0", @company_name="", @phone="375292449550">]
-    @future_users = get_users_by_query(@tomorrow)
-    #@response = send_smss(@users[0])
+    if is_admin?
+      @today = current_day
+      @tomorrow = next_day
+      @users = get_users_by_query(@today) #[#<Amorail::Contact:0x007f06300daa60 @last_modified=1489640612, @linked_leads_id=["13219534"], @id=27737398, @name="", @date_create=1475581903, @responsible_user_id=475077, @linked_company_id="0", @company_name="", @phone="375292449550">]
+      # @users = get_users_by_query("Пащенко") #[#<Amorail::Contact:0x007f06300daa60 @last_modified=1489640612, @linked_leads_id=["13219534"], @id=27737398, @name="", @date_create=1475581903, @responsible_user_id=475077, @linked_company_id="0", @company_name="", @phone="375292449550">]
+      @future_users = get_users_by_query(@tomorrow)
+      #@response = send_smss(@users[0])
+    else
+      redirect_to smss_denied_path
+    end
   end
 
   def send_all
-    today = current_day
-    users = get_users_by_query(today)
-    users.each do |user|
-      response = send_smss(user)
-      response["phone"] = user.phone
-      @responses_by_rocket ||= []
-      @responses_by_rocket << response
+    if is_admin?
+      today = current_day
+      users = get_users_by_query(today)
+      users.each do |user|
+        response = send_smss(user)
+        response["phone"] = user.phone
+        @responses_by_rocket ||= []
+        @responses_by_rocket << response
+      end
+    else
+      redirect_to smss_denied_path
     end
+  end
 
-  #  @responses_by_rocket.each do |r|
-
-  #  end
-
-  #  redirect_to root_path
-      # unless response["id"].empty?
-      #    redirect_to root_path, notice: 'SMS was successfully sent.'
-      # else
-      #    redirect_to root_path, notice: 'Somthing went wrong. Sorry :(.'
-      # end
+  def denied
   end
 
   private
@@ -103,6 +105,14 @@ class SmssController < ApplicationController
 
     def format_phone(phone)
       return phone.scan(/[0-9]/).join #scan all digits in array and join to string
+    end
+
+    def is_admin?
+      if current_user.id == 1
+        return true
+      else
+        return false
+      end
     end
 end
 

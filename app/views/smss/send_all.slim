@@ -1,0 +1,11 @@
+.container
+  table.table.table-striped
+    th phone
+    th status
+    th message id
+    -@responses_by_rocket.each do |r|
+      tr
+        td = r["phone"]
+        td = r["status"]
+        td = r["id"]
+  =link_to "Назад", :back, class: "btn btn-primary"

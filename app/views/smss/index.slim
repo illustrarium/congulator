@@ -1,0 +1,43 @@
+
+
+.container
+  p.notice=notice
+  p.alert=alert
+  h1.display-3 Поздравлятор
+  p Проверьте значения. ФИО должно быть именно в таком порядке. Номер в формате 375XXXXXXXXX.
+
+  p Сегодня #{@today} дни рождения у следующих людей:
+  table.table.table-striped
+    th width="10%" user id
+    th width="70%" name
+    th width="20%" phone
+    /th width="20%" action
+
+    -@users.each do |user|
+      tr
+        td = user.id
+        td = user.name
+        td = user.phone
+        /td 
+          a.btn.btn-secondary href="#" Отправить
+          br
+          a.edit-link href="#" Изменить и отправить
+    tr
+      td colspan="2"
+      td
+       =link_to "Отправить все", smss_send_all_path, class: "a btn btn-success"
+
+  p Завтра #{@tomorrow} дни рождения у следующих людей:
+  table.table.table-striped
+    th width="10%" user id
+    th width="70%" name
+    th width="20%" phone
+
+    -@future_users.each do |user|
+      tr
+        td = user.id
+        td = user.name
+        td = user.phone
+  
+  =@response
+  
